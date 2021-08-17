@@ -16,9 +16,12 @@ interface IPoker {
 
 interface ICardSlot {
     function opening() external view returns (uint256);
+    
     function round() external view returns (uint256);
-    function roundSales(uint256 numberOfRound) external view returns (uint256);
+    function today() external view returns (uint256);
+    
     function totalSales() external view returns (uint256);
+    function roundSales(uint256 numberOfRound) external view returns (uint256);
 }
 
 contract CardStore is Ownable, ReentrancyGuard {
@@ -118,12 +121,8 @@ contract CardStore is Ownable, ReentrancyGuard {
         levelCount = value;
     }
 
-    function today() public view returns (uint256) {
-        return ((block.timestamp - (cardSlot.opening())) / 1 days) + 1;
-    }
-
     function period() public view returns (uint256) {
-        uint256 tempPeriod = today() % 10;
+        uint256 tempPeriod = cardSlot.today() % 10;
         return tempPeriod > 0 ? tempPeriod : 10;
     }
 
@@ -166,7 +165,7 @@ contract CardStore is Ownable, ReentrancyGuard {
             return tokenAmount;
         }
 
-        uint256 numberOfDays = today();
+        uint256 numberOfDays = cardSlot.today();
         if (token == pokerToken && dailyPrice[numberOfDays] > 0) {
             return dailyPrice[numberOfDays];
         }
@@ -194,7 +193,7 @@ contract CardStore is Ownable, ReentrancyGuard {
         uint256 numberOfRound = cardSlot.round();
         require(numberOfRound > 0, "Not yet on sale");
 
-        uint256 numberOfDays = today();
+        uint256 numberOfDays = cardSlot.today();
         require(dailySales[numberOfDays] < todaySupply(), "Insufficient supply");
 
         (uint8 rank, uint8 suit, uint8 level, uint32 hashRate) = _createCardValues();
