@@ -91,12 +91,9 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
     event TeamExpenseProfitPaid(address indexed account, uint256 amount);
     event TeamRewardProfitPaid(address indexed account, uint256 amount);
 
-    constructor(address receiveToken_, address pokerToken_, address poker_) {
-        receiveToken = receiveToken_;
-        pokerToken = pokerToken_;
+    constructor(address poker_, address pokerToken_) {
         poker = poker_;
-
-        fundReceiver = _msgSender();
+        pokerToken = pokerToken_;
     }
 
     modifier updateReward(address account) {
