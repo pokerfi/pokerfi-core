@@ -69,11 +69,9 @@ contract CardSlot is Ownable, ReentrancyGuard {
     event TeamNameUpdated(address indexed account, string name);
     event MinHashRateChanged(address indexed account, uint256 amount);
 
-    constructor(address pokerToken_, address poker_) {
-        pokerToken = pokerToken_;
+    constructor(address poker_, address pokerToken_) {
         poker = poker_;
-
-        fundReceiver = _msgSender();
+        pokerToken = pokerToken_;
 
         opening = block.timestamp;
     }
