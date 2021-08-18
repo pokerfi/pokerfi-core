@@ -25,12 +25,11 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
 
     uint256 public constant SLOTS_PER_USER = 11;
 
-    address public immutable receiveToken;
-    address public immutable rewardsToken;
-
     address public immutable poker;
+    address public immutable pokerToken;
 
-    address public fundReceiver;
+    address public receiveToken = 0x55d398326f99059fF775485246999027B3197955;
+    address public fundReceiver = 0x5772e1Cdb6D6240c581792303189851e612c21f1;
 
     ICardSlot public cardSlot;
 
@@ -73,6 +72,7 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
     mapping(uint256 => uint256) public roundStakedTokens;
     mapping(uint256 => uint256) public roundWithdrawnTokens;
 
+    event ReceiveTokenUpdated(address indexed previousAddress, address indexed newAddress);
     event FundReceiverUpdated(address indexed previousAddress, address indexed newAddress);
 
     event CardSlotInterfaceUpdated(address indexed previousAddress, address indexed newAddress);
@@ -91,9 +91,9 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
     event TeamExpenseProfitPaid(address indexed account, uint256 amount);
     event TeamRewardProfitPaid(address indexed account, uint256 amount);
 
-    constructor(address receiveToken_, address rewardsToken_, address poker_) {
+    constructor(address receiveToken_, address pokerToken_, address poker_) {
         receiveToken = receiveToken_;
-        rewardsToken = rewardsToken_;
+        pokerToken = pokerToken_;
         poker = poker_;
 
         fundReceiver = _msgSender();
@@ -110,6 +110,15 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
             user.lastUpdateTime = block.timestamp;
         }
         _;
+    }
+
+    function setReceiveToken(address newAddress) external onlyOwner {
+        require(newAddress != address(0), "New address is the zero address");
+
+        address previousAddress = receiveToken;
+        receiveToken = newAddress;
+
+        emit ReceiveTokenUpdated(previousAddress, newAddress);
     }
 
     function setFundReceiver(address newAddress) external onlyOwner {
@@ -180,7 +189,7 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
     function releasedDuration(address account) public view returns (uint256) {
         User memory user = _users[account];
         if (user.hashRates > 0 && user.balance >= expensePerHashRate) {
-            uint256 balance = user.balance - user.expenses > 0 ?user.balance - user.expenses:0;
+            uint256 balance = user.balance - user.expenses > 0 ? user.balance - user.expenses : 0;
             return Math.min(block.timestamp, user.lastUpdateTime + balance / (expensePerHashRate * user.hashRates)) - user.lastUpdateTime;
         }
         return 1;
@@ -253,7 +262,7 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
             uint256 teamRewards = rewards / 20;
             uint256 payment = rewards - teamRewards;
 
-            IERC20(rewardsToken).safeTransfer(account, payment);
+            IERC20(pokerToken).safeTransfer(account, payment);
             emit RewardPaid(account, payment);
 
             for (uint256 i = 0; i < user.slots.length; i++) {
@@ -296,7 +305,7 @@ contract CardMine is Ownable, ReentrancyGuard, ERC721Holder {
         if (rewards > 0) {
             team.rewards = 0;
 
-            IERC20(rewardsToken).safeTransfer(account, rewards);
+            IERC20(pokerToken).safeTransfer(account, rewards);
             emit TeamRewardProfitPaid(account, rewards);
         }
     }
