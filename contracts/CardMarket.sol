@@ -17,8 +17,8 @@ contract CardMarket is Ownable, ReentrancyGuard, ERC721Holder {
 
     address public immutable poker;
 
-    address public receiveToken;
-    address public fundReceiver;
+    address public receiveToken = 0x55d398326f99059fF775485246999027B3197955;
+    address public fundReceiver = 0xA883795C2fa5D62d8517702fdc45fAAe811DE8de;
 
     uint256 public feeRate = 0;
 
@@ -48,8 +48,6 @@ contract CardMarket is Ownable, ReentrancyGuard, ERC721Holder {
 
     constructor(address poker_) {
         poker = poker_;
-
-        fundReceiver = _msgSender();
     }
 
     function setReceiveToken(address newAddress) external onlyOwner {
