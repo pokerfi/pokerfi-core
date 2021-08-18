@@ -144,8 +144,7 @@ contract CardStore is Ownable, ReentrancyGuard {
             totalSupply -= totalSales - previousRoundSales;
         }
 
-        uint256 numberOfPeriod = period();
-        if (totalSupply < 30 || numberOfPeriod == 10) {
+        if (totalSupply < 30) {
             uint256 currentRoundSales = roundSales[numberOfRound];
             if (numberOfRound % 2 == 0) {
                 currentRoundSales += roundSales[numberOfRound - 1];
@@ -153,7 +152,8 @@ contract CardStore is Ownable, ReentrancyGuard {
             return totalSupply - currentRoundSales;
         }
 
-        if (numberOfPeriod == 5) {
+        uint256 numberOfPeriod = period();
+        if (numberOfPeriod % 5 == 0) {
             return totalSupply / 30;
         }
         return (totalSupply * (6 - (numberOfPeriod % 5))) / 30;
