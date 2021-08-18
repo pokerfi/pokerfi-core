@@ -35,7 +35,7 @@ contract CardStore is Ownable, ReentrancyGuard {
     address public immutable pokerToken;
 
     address public receiveToken = 0x55d398326f99059fF775485246999027B3197955;
-    address public fundReceiver = 0x883248b3354305de4A40501bAedA2F59D964BA38;
+    address public fundReceiver = 0x76000F17fD34a1cB1Ccd78DF89F89fE1319CAca0;
 
     ICardSlot public cardSlot;
 
