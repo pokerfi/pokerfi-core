@@ -160,6 +160,8 @@ contract CardStore is Ownable, ReentrancyGuard {
     }
 
     function price(address token) public view returns (uint256) {
+        require(token == pokerToken || token == receiveToken, "Invalid token");
+
         uint256 tokenAmount = 30 ether + period() * 10 ether;
         if (token == receiveToken) {
             return tokenAmount;
