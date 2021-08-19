@@ -108,7 +108,7 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
     }
 
     function releasable(address account) public view returns (uint256) {
-        if (shares[account] == 0) {
+        if (shares[account] == 0 || rewardPerShare == 0) {
             return 0;
         }
         return shares[account] * (rewardPerShare - lastRewardPerShare[account]) / 1e18;
@@ -170,11 +170,9 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
 
             uint256 ethBalance = address(this).balance;
             if (ethBalance > 1e16 && totalShares > 0) {
-                uint256 tokenBalance = balanceOf(address(this)) - totalLiquidity;
-
+                uint256 lastTokenBalance = balanceOf(address(this)) - totalLiquidity;
                 UNISWAPV2_ROUTER.swapExactETHForTokensSupportingFeeOnTransferTokens{value: ethBalance}(0, path, address(this), block.timestamp);
-
-                rewardPerShare += (balanceOf(address(this)) - tokenBalance) * 1e18 / totalShares;
+                rewardPerShare += (balanceOf(address(this)) - lastTokenBalance) * 1e18 / totalShares;
             }
 
             _approve(address(this), address(UNISWAPV2_ROUTER), totalLiquidity);
