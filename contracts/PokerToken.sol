@@ -164,23 +164,23 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
     function _addLiquidity(uint256 amount) private {
         totalLiquidity += amount;
         if (totalLiquidity >= 1e18) {
-            _approve(address(this), address(UNISWAPV2_ROUTER), totalLiquidity);
-
-            uint256 liquidityAmount = totalLiquidity / 2;
-            totalLiquidity = 0;
-
             address[] memory path = new address[](2);
             path[0] = address(this);
             path[1] = UNISWAPV2_ROUTER.WETH();
 
             uint256 ethBalance = address(this).balance;
             if (ethBalance > 1e16 && totalShares > 0) {
-                uint256 tokenBalance = balanceOf(address(this)) - liquidityAmount;
+                uint256 tokenBalance = balanceOf(address(this)) - totalLiquidity;
 
                 UNISWAPV2_ROUTER.swapExactETHForTokensSupportingFeeOnTransferTokens{value: ethBalance}(0, path, address(this), block.timestamp);
 
                 rewardPerShare += (balanceOf(address(this)) - tokenBalance) * 1e18 / totalShares;
             }
+
+            _approve(address(this), address(UNISWAPV2_ROUTER), totalLiquidity);
+
+            uint256 liquidityAmount = totalLiquidity / 2;
+            totalLiquidity = 0;
 
             UNISWAPV2_ROUTER.swapExactTokensForETHSupportingFeeOnTransferTokens(liquidityAmount, 0, path, address(this), block.timestamp);
 
