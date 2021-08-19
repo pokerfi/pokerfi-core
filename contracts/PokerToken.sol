@@ -108,10 +108,14 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
         _mint(account, amount);
     }
 
+    function totalReceived() public view returns (uint256) {
+        return balanceOf(address(this)) + totalReleased - totalLiquidity;
+    }
+
     function releasable(address account) public view returns (uint256) {
-        uint256 totalReceived = (balanceOf(address(this)) + totalReleased - totalLiquidity);
-        if (totalReceived > 0 && totalShares > 0) {
-            return totalReceived * shares[account] / totalShares - released[account];
+        uint256 totalAmount = totalReceived();
+        if (balanceOf(address(this)) > 0 && totalAmount > 0 && totalShares > 0) {
+            return totalAmount * shares[account] / totalShares - released[account];
         }
         return 0;
     }
