@@ -67,12 +67,11 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
     FeeRate public feeRate;
 
     uint256 public totalLiquidity;
-
     uint256 public totalShares;
-    uint256 public totalReleased;
+    uint256 public rewardPerShare;
 
     mapping(address => uint256) public shares;
-    mapping(address => uint256) public released;
+    mapping(address => uint256) public lastRewardPerShare;
 
     event FeeRateUpdated(uint8 previousBurnRate, uint8 previousLiquidityRate, uint8 previousRewardRate, uint8 newBurnRate, uint8 newLiquidityRate, uint8 newRewardRate);
 
@@ -108,33 +107,27 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
         _mint(account, amount);
     }
 
-    function totalReceived() public view returns (uint256) {
-        return balanceOf(address(this)) + totalReleased - totalLiquidity;
-    }
-
     function releasable(address account) public view returns (uint256) {
-        uint256 totalAmount = totalReceived();
-        if (balanceOf(address(this)) > 0 && totalAmount > 0 && totalShares > 0) {
-            return totalAmount * shares[account] / totalShares - released[account];
+        if (shares[account] == 0) {
+            return 0;
         }
-        return 0;
+        return shares[account] * (rewardPerShare - lastRewardPerShare[account]) / 1e18;
     }
 
     function release(address account) public {
         uint256 amount = releasable(account);
         if (amount > 0) {
-            released[account] += amount;
-            totalReleased += amount;
-
             _transfer(address(this), account, amount);
-
             emit Released(account, amount);
         }
+        lastRewardPerShare[account] = rewardPerShare;
     }
 
     function _transfer(address sender, address recipient, uint256 amount) internal override {
         if (feeRate.burn > 0 || feeRate.liquidity > 0 || feeRate.reward > 0) {
             if ((sender == address(UNISWAPV2_ROUTER) || sender == uniswapV2Pair) && !isWhitelisted(recipient)) {
+                release(recipient);
+
                 shares[recipient] += amount;
                 totalShares += amount;
             }
@@ -146,13 +139,15 @@ contract PokerToken is Whitelisted, ERC20, ERC20Burnable {
 
                 _burn(address(this), burnAmount);
                 _addLiquidity(liquidityAmount);
+
+                rewardPerShare += (totalShares > 0 ? rewardAmount * 1e18 / totalShares : rewardAmount);
             }
 
             uint256 senderBalance = balanceOf(sender);
-            if (shares[sender] >= senderBalance) {
+            if ((sender != address(UNISWAPV2_ROUTER) || sender != uniswapV2Pair) && shares[sender] >= senderBalance) {
                 release(sender);
 
-                uint256 deductedShares = (senderBalance - amount == 0) ? shares[sender] : amount;
+                uint256 deductedShares = (senderBalance == amount) ? shares[sender] : amount;
                 shares[sender] -= deductedShares;
                 totalShares -= deductedShares;
             }
