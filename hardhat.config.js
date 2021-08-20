@@ -14,13 +14,11 @@ module.exports = {
         testnet: {
             url: process.env.TESTNET_RPC_URL,
             chainId: process.env.TESTNET_CHAINID | 97,
-            gasPrice: 6000000000,
             accounts: { mnemonic: process.env.MNEMONIC }
         },
         mainnet: {
             url: process.env.MAINNET_RPC_URL,
             chainId: process.env.MAINNET_CHAINID | 56,
-            gasPrice: 6000000000,
             accounts: { mnemonic: process.env.MNEMONIC }
         }
     },
@@ -28,7 +26,7 @@ module.exports = {
         apiKey: process.env.ETHERSCAN_API_KEY
     },
     solidity: {
-        version: "0.8.0",
+        version: "0.8.6",
         settings: {
             optimizer: {
                 enabled: true,

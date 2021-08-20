@@ -1,18 +1,18 @@
 {
     "name": "pokerfi-core",
-    "version": "2.0",
+    "version": "1.0.0",
     "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.0.2",
-        "@nomiclabs/hardhat-etherscan": "^2.1.4",
+        "@nomiclabs/hardhat-etherscan": "^2.1.5",
         "@nomiclabs/hardhat-waffle": "^2.0.1",
-        "@openzeppelin/contracts": "^4.2.0",
+        "@openzeppelin/contracts": "^4.3.0",
         "@uniswap/lib": "^4.0.1-alpha",
         "@uniswap/v2-core": "^1.0.1",
         "@uniswap/v2-periphery": "^1.1.0-beta.0",
         "chai": "^4.3.4",
         "dotenv": "^10.0.0",
         "ethereum-waffle": "^3.4.0",
-        "ethers": "^5.4.4",
-        "hardhat": "^2.6.0"
+        "ethers": "^5.4.5",
+        "hardhat": "^2.6.1"
     }
 }
