@@ -181,8 +181,6 @@ contract CardStore is Ownable, ReentrancyGuard {
     }
 
     function purchase(address token, address referrer) external nonReentrant {
-        require(token == pokerToken || token == receiveToken, "Invalid token");
-
         address account = _msgSender();
         require(!account.isContract(), "Caller cannot be contract address");
 
