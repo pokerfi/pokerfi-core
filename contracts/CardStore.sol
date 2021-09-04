@@ -54,8 +54,6 @@ contract CardStore is Ownable, ReentrancyGuard {
 
     mapping(uint256 => uint256) public dailyPrice;
 
-    mapping(address => bool) public migrated;
-
     uint256 private _randomNonce = 0;
 
     mapping(uint256 => uint256[5]) private _percentOfRanks;
